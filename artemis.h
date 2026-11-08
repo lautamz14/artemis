@@ -1,0 +1,63 @@
+#ifndef ARTEMIS_H
+#define ARTEMIS_H
+
+/* Datos de referencia del escenario 3 de la consigna. */
+#define ARTEMIS_MASA_KG 26000.0
+#define ARTEMIS_VELOCIDAD_TLI_MS 10900.0
+#define ARTEMIS_ALTITUD_LEO_M 192000.0
+#define ARTEMIS_DISTANCIA_TIERRA_LUNA_M 384000000.0
+
+/* Constantes terrestres del escenario 2 de la consigna. */
+#define ARTEMIS_G 6.674e-11
+#define ARTEMIS_MASA_TIERRA_KG 5.972e24
+#define ARTEMIS_RADIO_TIERRA_M 6371000.0
+
+/* Dato adicional del modelo, NO proporcionado en el escenario 3. */
+#define ARTEMIS_MASA_LUNA_KG 7.342e22
+
+/* Cantidad maxima de eventos que puede almacenar el historial*/
+#define ARTEMIS_MAX_EVENTOS 4
+
+/* Aca preferi usar nombres para las etapas de simulacion para saber que representa
+y como no se le asignan datos los asigna el programa con valores enteros comenzando desde el 0*/
+typedef enum {
+    ETAPA_PREPARACION,
+    ETAPA_TLI,
+    ETAPA_INERCIA,
+    ETAPA_EVALUACION
+} EtapaMision;
+
+/* La estructura mision que es un registro basicamente para saber los estados o resultados de la mision y
+justamente le puse el typedef para que le pueda llamar mision */
+typedef struct {
+    double masa_kg;
+    double velocidad_base_ms;
+    double ajuste_tli_ms;
+    double velocidad_final_ms;
+    double energia_base_j;
+    double energia_final_j;
+    double incremento_energia_j;
+    double distancia_equilibrio_m;
+    double cambio_potencial_j_kg;
+    double trabajo_adicional_j_kg;
+    double velocidad_minima_ms;
+    double velocidad_equilibrio_ms;
+    /* El de abajo esta representado por valores logicos, le asigne un entero para que en todo el programa tomen valores 
+    de 0 para falso y 1 verdadero, asi no tenemos que agregar otra cabecera que es la de los booleanos*/
+    int alcanza_equilibrio;
+    int modo_experimental;
+    EtapaMision etapa;
+    int historial[ARTEMIS_MAX_EVENTOS];
+    int cantidad_eventos;
+} Mision;
+
+/* Funciones publicas del modulo de simulacion. */
+void artemis_inicializar(Mision *estado, double masa, double velocidad,
+                        int modo_experimental);
+void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad);
+int artemis_avanzar_evento(Mision *estado);
+void artemis_mostrar_estado(const Mision *estado);
+void artemis_mostrar_reporte(const Mision *estado);
+void artemis_mostrar_fundamentos(void);
+
+#endif
