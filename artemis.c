@@ -156,4 +156,76 @@ int artemis_avanzar_evento(Mision *estado)
     return 0;
 }
 
+void artemis_mostrar_estado(const Mision *estado)
+{
+    printf("\nOrion | %s | Masa: %.0f kg\n",
+           estado->modo_experimental ? "modo experimental" : "modo referencia",
+           estado->masa_kg);
+    if (estado->etapa == ETAPA_PREPARACION) {
+        printf("Velocidad base planificada: %.2f m/s\n", estado->velocidad_base_ms);
+        puts("Estado: esperando la maniobra TLI.");
+    } else {
+        printf("Velocidad de salida: %.2f m/s | Ajuste: +%.0f m/s\n",
+               estado->velocidad_final_ms, estado->ajuste_tli_ms);
+        printf("Eventos completados: %d de 3\n", estado->cantidad_eventos - 1);
+    }
+}
 
+void artemis_mostrar_reporte(const Mision *estado)
+{
+    int i;
+
+    puts("\n============= REPORTE ARTEMIS =============");
+    printf("Modo: %s\n", estado->modo_experimental ? "experimental" : "referencia");
+    printf("Masa: %.2f kg\n", estado->masa_kg);
+    printf("Velocidad base: %.2f m/s\n", estado->velocidad_base_ms);
+    printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
+
+    if (estado->etapa == ETAPA_PREPARACION) {
+        puts("Aun no se ejecuto la TLI. No hay evaluacion energetica.");
+    } else {
+        printf("Ajuste TLI previo al desacople: +%.0f m/s\n", estado->ajuste_tli_ms);
+        printf("Velocidad de salida: %.2f m/s\n", estado->velocidad_final_ms);
+        printf("Energia cinetica de salida: %.6e J\n", estado->energia_final_j);
+        printf("Incremento de energia cinetica por ajuste: %.6e J\n",
+               estado->incremento_energia_j);
+        printf("Punto de equilibrio idealizado: %.2f km desde el centro terrestre\n",
+               estado->distancia_equilibrio_m / 1000.0);
+        printf("Cambio de potencial gravitatorio: %.2f J/kg\n",
+               estado->cambio_potencial_j_kg);
+        printf("Velocidad minima de salida idealizada: %.2f m/s\n",
+               estado->velocidad_minima_ms);
+        printf("Trabajo especifico adicional aun requerido: %.2f J/kg\n",
+               estado->trabajo_adicional_j_kg);
+        if (estado->etapa == ETAPA_EVALUACION) {
+            printf("Evaluacion: %s\n", estado->alcanza_equilibrio
+                   ? "alcanza el equilibrio en este modelo"
+                   : "NO alcanza el equilibrio en este modelo");
+        } else {
+            puts("Evaluacion final: pendiente de completar los eventos.");
+        }
+    }
+
+    puts("Historial de eventos:");
+    for (i = 0; i < estado->cantidad_eventos; i++) {
+        printf("  %d. %s\n", i + 1, nombre_evento(estado->historial[i]));
+    }
+    puts("Limites: modelo 1D con cuerpos fijos; sin orbita ni consumo de combustible.");
+    puts("===========================================");
+}
+
+void artemis_mostrar_fundamentos(void)
+{
+    puts("\n============= FUNDAMENTOS =============");
+    puts("1. Inercia: sin propulsores la nave sigue moviendose;");
+    puts("   la gravedad produce aceleracion y altera su velocidad.");
+    puts("2. Energia cinetica: K = (m * v * v) / 2.");
+    puts("3. Conservacion: si no hay empuje ni perdidas, K + U es constante.");
+    puts("4. Equilibrio idealizado: igual magnitud de atraccion de Tierra y Luna.");
+    puts("5. El ajuste +delta-v se aplica ANTES del desacople de ICPS.");
+    puts("6. El incremento de K NO equivale al combustible consumido.");
+    puts("7. Una ida real puede requerir mas propulsion desde el pozo terrestre,");
+    puts("   pero el combustible depende de la nave y del plan de vuelo.");
+    puts("Este prototipo NO reproduce la trayectoria orbital de retorno libre.");
+    puts("=========================================");
+}
