@@ -53,3 +53,15 @@ dkms.conf
 
 # debug information files
 *.dwo
+
+# Ejecutable de artemis en Linux
+/artemis
+
+# Configuracion local de VS
+.vscode/
+
+# Archivos temporales y de respaldo
+*.stackdump
+*~
+*.swp
+.DS_Store
