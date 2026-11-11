@@ -13,7 +13,10 @@
            - ARTEMIS_G * ARTEMIS_MASA_LUNA_KG / distancia_luna_m;
 }
 
-static double calcular_equilibrio(void)
+/* Calcula la distancia desde la Tierra hasta el punto
+   donde se equilibran las fuerzas gravitatorias
+   de la Tierra y la Luna en el modelo idealizado. */
+   static double calcular_equilibrio(void)
 {
     return ARTEMIS_DISTANCIA_TIERRA_LUNA_M /
            (1.0 + sqrt(ARTEMIS_MASA_LUNA_KG / ARTEMIS_MASA_TIERRA_KG));
