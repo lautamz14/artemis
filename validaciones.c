@@ -52,3 +52,34 @@ static int solo_espacios(const char *texto)
     }
     return 1;
 }
+
+int leer_entero_rango(const char *mensaje, int minimo, int maximo, int *valor)
+{
+    char linea[TAM_LINEA];
+    char *fin;
+    long resultado;
+    int estado;
+
+    for (;;) {
+        estado = leer_linea(mensaje, linea, sizeof linea);
+        if (estado == 0) {
+            return 0;
+        }
+        if (estado < 0) {
+            mostrar_advertencia("La entrada es demasiado larga.");
+            continue;
+        }
+
+        errno = 0;
+        resultado = strtol(linea, &fin, 10);
+        if (fin == linea || errno == ERANGE || !solo_espacios(fin) ||
+            resultado < INT_MIN || resultado > INT_MAX ||
+            resultado < minimo || resultado > maximo) {
+            printf("[AVISO] Ingresa un entero entre %d y %d.\n", minimo, maximo);
+            continue;
+        }
+
+        *valor = (int)resultado;
+        return 1;
+    }
+}
