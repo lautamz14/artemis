@@ -7,7 +7,6 @@
 static double potencial_especifico(double distancia_tierra_m)
 {
     double distancia_luna_m = ARTEMIS_DISTANCIA_TIERRA_LUNA_M - distancia_tierra_m;
-
     return -ARTEMIS_G * ARTEMIS_MASA_TIERRA_KG / distancia_tierra_m
            - ARTEMIS_G * ARTEMIS_MASA_LUNA_KG / distancia_luna_m;
 }
@@ -76,6 +75,7 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     }
 
     /* El ajuste se decide ANTES del desacople: despues no hay empuje. */
+    /* Se registra el ajuste de velocidad elegido para la maniobra TLI. */
     estado->ajuste_tli_ms = ajuste_velocidad;
     estado->velocidad_final_ms = estado->velocidad_base_ms + ajuste_velocidad;
     estado->energia_final_j = 0.5 * estado->masa_kg *
