@@ -187,7 +187,25 @@ void artemis_mostrar_reporte(const Mision *estado)
     printf("Modo: %s\n", estado->modo_experimental ? "experimental" : "referencia");
     printf("Masa: %.2f kg\n", estado->masa_kg);
     printf("Velocidad base: %.2f m/s\n", estado->velocidad_base_ms);
-    printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
+    puts("\n--- COMPARACION DE DECISIONES TLI ---");
+
+printf("Velocidad sin ajuste: %.2f m/s\n",
+       estado->velocidad_base_ms);
+
+printf("Velocidad con ajuste: %.2f m/s\n",
+       estado->velocidad_final_ms);
+
+printf("Diferencia de velocidad: %+.2f m/s\n",
+       estado->velocidad_final_ms - estado->velocidad_base_ms);
+
+printf("Energia cinetica sin ajuste: %.2e J\n",
+       0.5 * estado->masa_kg *
+       estado->velocidad_base_ms * estado->velocidad_base_ms);
+
+printf("Energia cinetica con ajuste: %.2e J\n",
+       0.5 * estado->masa_kg *
+       estado->velocidad_final_ms * estado->velocidad_final_ms);
+       printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
 
     if (estado->etapa == ETAPA_PREPARACION) {
         puts("Aun no se ejecuto la TLI. No hay evaluacion energetica.");
