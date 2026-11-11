@@ -4,7 +4,9 @@
 #include <stdio.h>
 
 /* Modelo educativo 1D: Tierra y Luna quietas y masas puntuales. */
-static double potencial_especifico(double distancia_tierra_m)
+/* Calcula el potencial gravitatorio especifico generado
+   por la Tierra y la Luna en una posicion determinada. */
+   static double potencial_especifico(double distancia_tierra_m)
 {
     double distancia_luna_m = ARTEMIS_DISTANCIA_TIERRA_LUNA_M - distancia_tierra_m;
     return -ARTEMIS_G * ARTEMIS_MASA_TIERRA_KG / distancia_tierra_m
