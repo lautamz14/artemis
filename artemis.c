@@ -9,6 +9,7 @@
    static double potencial_especifico(double distancia_tierra_m)
 {
     double distancia_luna_m = ARTEMIS_DISTANCIA_TIERRA_LUNA_M - distancia_tierra_m;
+
     return -ARTEMIS_G * ARTEMIS_MASA_TIERRA_KG / distancia_tierra_m
            - ARTEMIS_G * ARTEMIS_MASA_LUNA_KG / distancia_luna_m;
 }
@@ -95,7 +96,7 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
 
     /* Balance energetico: se compara la energia cinetica
    especifica disponible con el cambio de potencial. */
-   energia_especifica = 0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms;
+    energia_especifica = 0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms;
     energia_restante = energia_especifica - estado->cambio_potencial_j_kg;
 
     estado->velocidad_minima_ms = sqrt(2.0 * estado->cambio_potencial_j_kg);
@@ -187,25 +188,7 @@ void artemis_mostrar_reporte(const Mision *estado)
     printf("Modo: %s\n", estado->modo_experimental ? "experimental" : "referencia");
     printf("Masa: %.2f kg\n", estado->masa_kg);
     printf("Velocidad base: %.2f m/s\n", estado->velocidad_base_ms);
-    puts("\n--- COMPARACION DE DECISIONES TLI ---");
-
-printf("Velocidad sin ajuste: %.2f m/s\n",
-       estado->velocidad_base_ms);
-
-printf("Velocidad con ajuste: %.2f m/s\n",
-       estado->velocidad_final_ms);
-
-printf("Diferencia de velocidad: %+.2f m/s\n",
-       estado->velocidad_final_ms - estado->velocidad_base_ms);
-
-printf("Energia cinetica sin ajuste: %.2e J\n",
-       0.5 * estado->masa_kg *
-       estado->velocidad_base_ms * estado->velocidad_base_ms);
-
-printf("Energia cinetica con ajuste: %.2e J\n",
-       0.5 * estado->masa_kg *
-       estado->velocidad_final_ms * estado->velocidad_final_ms);
-       printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
+    printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
 
     if (estado->etapa == ETAPA_PREPARACION) {
         puts("Aun no se ejecuto la TLI. No hay evaluacion energetica.");
