@@ -78,6 +78,7 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     /* Se registra el ajuste de velocidad elegido para la maniobra TLI. */
     estado->ajuste_tli_ms = ajuste_velocidad;
     estado->velocidad_final_ms = estado->velocidad_base_ms + ajuste_velocidad;
+    /* Se calcula la energia cinetica final luego del ajuste de velocidad TLI. */
     estado->energia_final_j = 0.5 * estado->masa_kg *
                               estado->velocidad_final_ms * estado->velocidad_final_ms;
     estado->incremento_energia_j = estado->energia_final_j - estado->energia_base_j;
