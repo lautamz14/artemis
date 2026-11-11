@@ -52,3 +52,69 @@ static int solo_espacios(const char *texto)
     }
     return 1;
 }
+int leer_entero_rango(const char *mensaje, int minimo, int maximo, int *valor)
+{
+    char linea[TAM_LINEA];
+    char *fin;
+    long numero;
+    int resultado;
+
+    while (1) {
+        resultado = leer_linea(mensaje, linea, sizeof(linea));
+
+        if (resultado == 0) return 0;
+
+        if (resultado == -1 || solo_espacios(linea)) {
+            mostrar_advertencia("Entrada invalida.");
+            continue;
+        }
+
+        errno = 0;
+        numero = strtol(linea, &fin, 10);
+
+        while (isspace((unsigned char)*fin)) fin++;
+
+        if (errno == ERANGE || fin == linea ||
+            *fin != '\0' || numero < minimo || numero > maximo) {
+            mostrar_advertencia("Ingrese un entero dentro del rango.");
+            continue;
+        }
+
+        *valor = (int)numero;
+        return 1;
+    }
+}
+
+int leer_real_rango(const char *mensaje, double minimo, double maximo, double *valor)
+{
+    char linea[TAM_LINEA];
+    char *fin;
+    double numero;
+    int resultado;
+
+    while (1) {
+        resultado = leer_linea(mensaje, linea, sizeof(linea));
+
+        if (resultado == 0) return 0;
+
+        if (resultado == -1 || solo_espacios(linea)) {
+            mostrar_advertencia("Entrada invalida.");
+            continue;
+        }
+
+        errno = 0;
+        numero = strtod(linea, &fin);
+
+        while (isspace((unsigned char)*fin)) fin++;
+
+        if (errno == ERANGE || fin == linea ||
+            *fin != '\0' || !isfinite(numero) ||
+            numero < minimo || numero > maximo) {
+            mostrar_advertencia("Ingrese un numero dentro del rango.");
+            continue;
+        }
+
+        *valor = numero;
+        return 1;
+    }
+}
