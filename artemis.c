@@ -4,15 +4,19 @@
 #include <stdio.h>
 
 /* Modelo educativo 1D: Tierra y Luna quietas y masas puntuales. */
-static double potencial_especifico(double distancia_tierra_m)
+/* Calcula el potencial gravitatorio especifico generado
+   por la Tierra y la Luna en una posicion determinada. */
+   static double potencial_especifico(double distancia_tierra_m)
 {
     double distancia_luna_m = ARTEMIS_DISTANCIA_TIERRA_LUNA_M - distancia_tierra_m;
-
     return -ARTEMIS_G * ARTEMIS_MASA_TIERRA_KG / distancia_tierra_m
            - ARTEMIS_G * ARTEMIS_MASA_LUNA_KG / distancia_luna_m;
 }
 
-static double calcular_equilibrio(void)
+/* Calcula la distancia desde la Tierra hasta el punto
+   donde se equilibran las fuerzas gravitatorias
+   de la Tierra y la Luna en el modelo idealizado. */
+   static double calcular_equilibrio(void)
 {
     return ARTEMIS_DISTANCIA_TIERRA_LUNA_M /
            (1.0 + sqrt(ARTEMIS_MASA_LUNA_KG / ARTEMIS_MASA_TIERRA_KG));
@@ -76,8 +80,10 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     }
 
     /* El ajuste se decide ANTES del desacople: despues no hay empuje. */
+    /* Se registra el ajuste de velocidad elegido para la maniobra TLI. */
     estado->ajuste_tli_ms = ajuste_velocidad;
     estado->velocidad_final_ms = estado->velocidad_base_ms + ajuste_velocidad;
+    /* Se calcula la energia cinetica final luego del ajuste de velocidad TLI. */
     estado->energia_final_j = 0.5 * estado->masa_kg *
                               estado->velocidad_final_ms * estado->velocidad_final_ms;
     estado->incremento_energia_j = estado->energia_final_j - estado->energia_base_j;
@@ -87,7 +93,9 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
         potencial_especifico(estado->distancia_equilibrio_m) -
         potencial_especifico(radio_inicial);
 
-    energia_especifica = 0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms;
+    /* Balance energetico: se compara la energia cinetica
+   especifica disponible con el cambio de potencial. */
+   energia_especifica = 0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms;
     energia_restante = energia_especifica - estado->cambio_potencial_j_kg;
 
     estado->velocidad_minima_ms = sqrt(2.0 * estado->cambio_potencial_j_kg);
@@ -179,7 +187,25 @@ void artemis_mostrar_reporte(const Mision *estado)
     printf("Modo: %s\n", estado->modo_experimental ? "experimental" : "referencia");
     printf("Masa: %.2f kg\n", estado->masa_kg);
     printf("Velocidad base: %.2f m/s\n", estado->velocidad_base_ms);
-    printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
+    puts("\n--- COMPARACION DE DECISIONES TLI ---");
+
+printf("Velocidad sin ajuste: %.2f m/s\n",
+       estado->velocidad_base_ms);
+
+printf("Velocidad con ajuste: %.2f m/s\n",
+       estado->velocidad_final_ms);
+
+printf("Diferencia de velocidad: %+.2f m/s\n",
+       estado->velocidad_final_ms - estado->velocidad_base_ms);
+
+printf("Energia cinetica sin ajuste: %.2e J\n",
+       0.5 * estado->masa_kg *
+       estado->velocidad_base_ms * estado->velocidad_base_ms);
+
+printf("Energia cinetica con ajuste: %.2e J\n",
+       0.5 * estado->masa_kg *
+       estado->velocidad_final_ms * estado->velocidad_final_ms);
+       printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
 
     if (estado->etapa == ETAPA_PREPARACION) {
         puts("Aun no se ejecuto la TLI. No hay evaluacion energetica.");

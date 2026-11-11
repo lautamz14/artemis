@@ -52,34 +52,69 @@ static int solo_espacios(const char *texto)
     }
     return 1;
 }
-
 int leer_entero_rango(const char *mensaje, int minimo, int maximo, int *valor)
 {
     char linea[TAM_LINEA];
     char *fin;
-    long resultado;
-    int estado;
+    long numero;
+    int resultado;
 
-    for (;;) {
-        estado = leer_linea(mensaje, linea, sizeof linea);
-        if (estado == 0) {
-            return 0;
-        }
-        if (estado < 0) {
-            mostrar_advertencia("La entrada es demasiado larga.");
+    while (1) {
+        resultado = leer_linea(mensaje, linea, sizeof(linea));
+
+        if (resultado == 0) return 0;
+
+        if (resultado == -1 || solo_espacios(linea)) {
+            mostrar_advertencia("Entrada invalida.");
             continue;
         }
 
         errno = 0;
-        resultado = strtol(linea, &fin, 10);
-        if (fin == linea || errno == ERANGE || !solo_espacios(fin) ||
-            resultado < INT_MIN || resultado > INT_MAX ||
-            resultado < minimo || resultado > maximo) {
-            printf("[AVISO] Ingresa un entero entre %d y %d.\n", minimo, maximo);
+        numero = strtol(linea, &fin, 10);
+
+        while (isspace((unsigned char)*fin)) fin++;
+
+        if (errno == ERANGE || fin == linea ||
+            *fin != '\0' || numero < minimo || numero > maximo) {
+            mostrar_advertencia("Ingrese un entero dentro del rango.");
             continue;
         }
 
-        *valor = (int)resultado;
+        *valor = (int)numero;
+        return 1;
+    }
+}
+
+int leer_real_rango(const char *mensaje, double minimo, double maximo, double *valor)
+{
+    char linea[TAM_LINEA];
+    char *fin;
+    double numero;
+    int resultado;
+
+    while (1) {
+        resultado = leer_linea(mensaje, linea, sizeof(linea));
+
+        if (resultado == 0) return 0;
+
+        if (resultado == -1 || solo_espacios(linea)) {
+            mostrar_advertencia("Entrada invalida.");
+            continue;
+        }
+
+        errno = 0;
+        numero = strtod(linea, &fin);
+
+        while (isspace((unsigned char)*fin)) fin++;
+
+        if (errno == ERANGE || fin == linea ||
+            *fin != '\0' || !isfinite(numero) ||
+            numero < minimo || numero > maximo) {
+            mostrar_advertencia("Ingrese un numero dentro del rango.");
+            continue;
+        }
+
+        *valor = numero;
         return 1;
     }
 }
