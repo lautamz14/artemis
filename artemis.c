@@ -88,7 +88,9 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
         potencial_especifico(estado->distancia_equilibrio_m) -
         potencial_especifico(radio_inicial);
 
-    energia_especifica = 0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms;
+    /* Balance energetico: se compara la energia cinetica
+   especifica disponible con el cambio de potencial. */
+   energia_especifica = 0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms;
     energia_restante = energia_especifica - estado->cambio_potencial_j_kg;
 
     estado->velocidad_minima_ms = sqrt(2.0 * estado->cambio_potencial_j_kg);
