@@ -99,6 +99,8 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     energia_restante = energia_especifica - estado->cambio_potencial_j_kg;
 
     estado->velocidad_minima_ms = sqrt(2.0 * estado->cambio_potencial_j_kg);
+     /* Interpretacion A: deficit especifico POST-TLI frente al nivel de
+       potencial del equilibrio estatico. No representa combustible. */
     estado->deficit_energetico_j_kg = fmax(0.0, -energia_restante);
     estado->supera_umbral_energetico = energia_restante >= 0.0;
     estado->alcanza_equilibrio = energia_restante >= 0.0;
@@ -137,17 +139,21 @@ int artemis_avanzar_evento(Mision *estado)
 
     if (estado->etapa == ETAPA_INERCIA) {
         puts("\n[EVENTO 3] Evaluacion energetica.");
-        printf("Equilibrio idealizado: %.2f km desde el centro terrestre\n",
+        printf("Equilibrio de atracciones en el modelo estatico: %.2f km desde la Tierra\n",
                estado->distancia_equilibrio_m / 1000.0);
-        printf("Cambio de potencial: %.2f J/kg\n", estado->cambio_potencial_j_kg);
+        printf("Aumento de potencial especifico: %.2f J/kg\n",
+               estado->cambio_potencial_j_kg);
+        printf("Energia cinetica especifica post-TLI: %.2f J/kg\n",
+               0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms);
         if (estado->supera_umbral_energetico) {
-            puts("Resultado: energia suficiente en el modelo 1D para ese punto.");
+            puts("Resultado: energia suficiente para el nivel de potencial objetivo.");
         } else {
-            puts("Resultado: energia insuficiente en el modelo 1D.");
-            printf("Trabajo especifico adicional minimo: %.2f J/kg\n",
+            puts("Resultado: energia insuficiente para el nivel de potencial objetivo.");
+            printf("Deficit energetico especifico: %.2f J/kg\n",
                    estado->deficit_energetico_j_kg);
+            puts("Ese aporte habria sido necesario antes del apagado.");
         }
-        puts("Esto NO demuestra llegada a la Luna ni retorno libre real.");
+        puts("El balance NO demuestra llegada a la Luna ni retorno libre real.");
         estado->etapa = ETAPA_EVALUACION;
         registrar_evento(estado, 3);
         return 1;
@@ -183,29 +189,30 @@ void artemis_mostrar_reporte(const Mision *estado)
     puts("\n============= REPORTE ARTEMIS =============");
     printf("Modo: %s\n", estado->modo_experimental ? "experimental" : "referencia");
     printf("Masa: %.2f kg\n", estado->masa_kg);
-    printf("Velocidad base: %.2f m/s\n", estado->velocidad_base_ms);
-    printf("Energia cinetica con velocidad base: %.6e J\n", estado->energia_base_j);
+    printf("Rapidez post-TLI de referencia: %.2f m/s\n", estado->velocidad_base_ms);
+    printf("Energia cinetica de referencia: %.6e J\n", estado->energia_base_j);
 
     if (estado->etapa == ETAPA_PREPARACION) {
         puts("Aun no se ejecuto la TLI. No hay evaluacion energetica.");
     } else {
-        printf("Ajuste TLI previo al desacople: +%.0f m/s\n", estado->ajuste_tli_ms);
-        printf("Velocidad de salida: %.2f m/s\n", estado->velocidad_final_ms);
-        printf("Energia cinetica de salida: %.6e J\n", estado->energia_final_j);
+        printf("Ajuste ideal previo al desacople: +%.0f m/s\n", estado->ajuste_tli_ms);
+        printf("Rapidez post-TLI elegida: %.2f m/s\n", estado->velocidad_final_ms);
+        printf("Energia cinetica post-TLI: %.6e J\n", estado->energia_final_j);
         printf("Incremento de energia cinetica por ajuste: %.6e J\n",
                estado->incremento_energia_j);
-        printf("Punto de equilibrio idealizado: %.2f km desde el centro terrestre\n",
+        printf("Equilibrio de atracciones (modelo estatico): %.2f km desde la Tierra\n",
                estado->distancia_equilibrio_m / 1000.0);
-        printf("Cambio de potencial gravitatorio: %.2f J/kg\n",
+        printf("Aumento de potencial especifico: %.2f J/kg\n",
                estado->cambio_potencial_j_kg);
-        printf("Velocidad minima de salida idealizada: %.2f m/s\n",
-               estado->velocidad_minima_ms);
-        printf("Trabajo especifico adicional aun requerido: %.2f J/kg\n",
+        printf("Rapidez umbral del modelo: %.2f m/s\n", estado->velocidad_minima_ms);
+        printf("Energia cinetica especifica post-TLI: %.2f J/kg\n",
+               0.5 * estado->velocidad_final_ms * estado->velocidad_final_ms);
+        printf("Deficit energetico especifico (interpretacion A): %.2f J/kg\n",
                estado->deficit_energetico_j_kg);
         if (estado->etapa == ETAPA_EVALUACION) {
-            printf("Evaluacion: %s\n", estado->supera_umbral_energetico
-                   ? "alcanza el equilibrio en este modelo"
-                   : "NO alcanza el equilibrio en este modelo");
+            printf("Balance energetico: %s\n", estado->supera_umbral_energetico
+                   ? "energia suficiente para el nivel de potencial objetivo"
+                   : "energia insuficiente para el nivel de potencial objetivo");
         } else {
             puts("Evaluacion final: pendiente de completar los eventos.");
         }
