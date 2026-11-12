@@ -57,8 +57,9 @@ void artemis_inicializar(Mision *estado, double masa, double velocidad,
     estado->distancia_equilibrio_m = calcular_equilibrio();
     estado->cambio_potencial_j_kg = 0.0;
     estado->trabajo_adicional_j_kg = 0.0;
+    estado->deficit_energetico_j_kg = 0,0;
     estado->velocidad_minima_ms = 0.0;
-    estado->velocidad_equilibrio_ms = 0.0;
+    estado->supera_umbral_energetico = 0;
     estado->alcanza_equilibrio = 0;
     estado->modo_experimental = modo_experimental;
     estado->etapa = ETAPA_PREPARACION;
@@ -100,11 +101,10 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     energia_restante = energia_especifica - estado->cambio_potencial_j_kg;
 
     estado->velocidad_minima_ms = sqrt(2.0 * estado->cambio_potencial_j_kg);
-    estado->trabajo_adicional_j_kg = fmax(0.0, -energia_restante);
+    estado->deficit_energetico_j_kg = fmax(0.0, -energia_restante);
+    estado->supera_umbral_energetico = energia_restante >= 0.0;
     estado->alcanza_equilibrio = energia_restante >= 0.0;
-    estado->velocidad_equilibrio_ms = estado->alcanza_equilibrio
-        ? sqrt(2.0 * energia_restante) : 0.0;
-
+   
     puts("\n[EVENTO 1] ICPS ejecuta la maniobra TLI.");
     printf("Ajuste decidido: +%.0f m/s\n", estado->ajuste_tli_ms);
     printf("Velocidad tras la TLI: %.2f m/s\n", estado->velocidad_final_ms);
@@ -142,14 +142,12 @@ int artemis_avanzar_evento(Mision *estado)
         printf("Equilibrio idealizado: %.2f km desde el centro terrestre\n",
                estado->distancia_equilibrio_m / 1000.0);
         printf("Cambio de potencial: %.2f J/kg\n", estado->cambio_potencial_j_kg);
-        if (estado->alcanza_equilibrio) {
+        if (estado->supera_umbral_energetico) {
             puts("Resultado: energia suficiente en el modelo 1D para ese punto.");
-            printf("Rapidez idealizada en ese punto: %.2f m/s\n",
-                   estado->velocidad_equilibrio_ms);
         } else {
             puts("Resultado: energia insuficiente en el modelo 1D.");
             printf("Trabajo especifico adicional minimo: %.2f J/kg\n",
-                   estado->trabajo_adicional_j_kg);
+                   estado->deficit_energetico_j_kg);
         }
         puts("Esto NO demuestra llegada a la Luna ni retorno libre real.");
         estado->etapa = ETAPA_EVALUACION;
@@ -205,9 +203,9 @@ void artemis_mostrar_reporte(const Mision *estado)
         printf("Velocidad minima de salida idealizada: %.2f m/s\n",
                estado->velocidad_minima_ms);
         printf("Trabajo especifico adicional aun requerido: %.2f J/kg\n",
-               estado->trabajo_adicional_j_kg);
+               estado->deficit_energetico_j_kg);
         if (estado->etapa == ETAPA_EVALUACION) {
-            printf("Evaluacion: %s\n", estado->alcanza_equilibrio
+            printf("Evaluacion: %s\n", estado->supera_umbral_energetico
                    ? "alcanza el equilibrio en este modelo"
                    : "NO alcanza el equilibrio en este modelo");
         } else {

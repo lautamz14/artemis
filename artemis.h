@@ -40,12 +40,13 @@ typedef struct {
     double distancia_equilibrio_m;
     double cambio_potencial_j_kg;
     double trabajo_adicional_j_kg;
+    double deficit_energetico_j_kg;
     double velocidad_minima_ms;
-    double velocidad_equilibrio_ms;
     /* El de abajo esta representado por valores logicos, le asigne un entero para que en todo el programa tomen valores 
     de 0 para falso y 1 verdadero, asi no tenemos que agregar otra cabecera que es la de los booleanos*/
     int alcanza_equilibrio;
     int modo_experimental;
+    int supera_umbral_energetico;
     EtapaMision etapa;
     int historial[ARTEMIS_MAX_EVENTOS];
     int cantidad_eventos;
