@@ -42,18 +42,6 @@ static const char *nombre_evento(int codigo)
     }
 }
 
-/* Encabezado de ancho fijo para los tres eventos de la mision. */
-static void mostrar_encabezado_evento(const char *titulo)
-{
-    const int ancho = 60;
-    int largo = (int)strlen(titulo);
-    int izquierda = (ancho - largo) / 2;
-    int derecha = ancho - largo - izquierda;
-
-    puts("\n+------------------------------------------------------------+");
-    printf("|%*s%s%*s|\n", izquierda, "", titulo, derecha, "");
-    puts("+------------------------------------------------------------+");
-}
 
 void artemis_inicializar(Mision *estado, double masa, double velocidad,
                         int modo_experimental)
@@ -117,7 +105,9 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     estado->deficit_energetico_j_kg = fmax(0.0, -energia_restante);
     estado->supera_umbral_energetico = energia_restante >= 0.0;
    
-    mostrar_encabezado_evento("EVENTO 1/3 - MANIOBRA TLI");
+    puts("\n+------------------------------------------------------------+");
+    puts("|                 EVENTO 1/3 - MANIOBRA TLI                  |");
+    puts("+------------------------------------------------------------+");
     puts("\n[ SITUACION ]");
     puts("La etapa superior ICPS acaba de realizar la maniobra de");
     puts("inyeccion translunar de Orion desde la orbita baja terrestre.");
@@ -158,7 +148,9 @@ int artemis_avanzar_evento(Mision *estado)
             -ARTEMIS_G * ARTEMIS_MASA_TIERRA_KG / (radio_inicial * radio_inicial)
             + ARTEMIS_G * ARTEMIS_MASA_LUNA_KG / (distancia_luna * distancia_luna);
 
-        mostrar_encabezado_evento("EVENTO 2/3 - VUELO SIN PROPULSION");
+        puts("\n+------------------------------------------------------------+");
+        puts("|             EVENTO 2/3 - VUELO SIN PROPULSION              |");
+        puts("+------------------------------------------------------------+");
         puts("\n[ SITUACION ]");
         puts("La TLI ha terminado. Orion continua su movimiento sin");
         puts("propulsion principal, bajo la atraccion gravitatoria.");
@@ -185,7 +177,9 @@ int artemis_avanzar_evento(Mision *estado)
     }
 
     if (estado->etapa == ETAPA_INERCIA) {
-        mostrar_encabezado_evento("EVENTO 3/3 - BALANCE ENERGETICO");
+        puts("\n+------------------------------------------------------------+");
+        puts("|              EVENTO 3/3 - BALANCE ENERGETICO               |");
+        puts("+------------------------------------------------------------+");
         puts("\n[ OBJETIVO ]");
         puts("Comparar la energia disponible tras la TLI con el aumento");
         puts("del potencial gravitatorio hasta el equilibrio idealizado.");
@@ -376,3 +370,4 @@ void artemis_mostrar_fundamentos(void)
     puts("\n[ ALCANCE ]");
     puts("Modelo didactico de Fisica I, no simulacion orbital real.");
     puts("============================================================");
+}
