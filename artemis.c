@@ -103,7 +103,6 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
        potencial del equilibrio estatico. No representa combustible. */
     estado->deficit_energetico_j_kg = fmax(0.0, -energia_restante);
     estado->supera_umbral_energetico = energia_restante >= 0.0;
-    estado->alcanza_equilibrio = energia_restante >= 0.0;
    
      puts("\n[EVENTO 1] ICPS ejecuta la maniobra TLI.");
     printf("Ajuste ideal previo al apagado: +%.0f m/s\n", estado->ajuste_tli_ms);
