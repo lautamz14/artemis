@@ -56,11 +56,9 @@ void artemis_inicializar(Mision *estado, double masa, double velocidad,
     estado->incremento_energia_j = 0.0;
     estado->distancia_equilibrio_m = calcular_equilibrio();
     estado->cambio_potencial_j_kg = 0.0;
-    estado->trabajo_adicional_j_kg = 0.0;
     estado->deficit_energetico_j_kg = 0,0;
     estado->velocidad_minima_ms = 0.0;
     estado->supera_umbral_energetico = 0;
-    estado->alcanza_equilibrio = 0;
     estado->modo_experimental = modo_experimental;
     estado->etapa = ETAPA_PREPARACION;
     estado->cantidad_eventos = 0;
