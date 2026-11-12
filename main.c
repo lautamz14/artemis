@@ -36,6 +36,7 @@ int main(void)
         switch (opcion) {
             case 1:
                 puts("\nCONFIGURACION DE MISION");
+                puts("Balance energetico idealizado: no se calcula una orbita real.");
                 puts("1. Mision de referencia (datos de la consigna)");
                 puts("2. Simulacion experimental (elegir masa y velocidad)");
                 puts("3. Volver al menu principal");
@@ -51,12 +52,12 @@ int main(void)
                 if (modo == 1) {
                     masa = ARTEMIS_MASA_KG;
                     velocidad = ARTEMIS_VELOCIDAD_TLI_MS;
-                    printf("\nReferencia: %.0f kg y %.0f m/s.\n", masa, velocidad);
+                    printf("\nReferencia: %.0f kg y rapidez post-TLI de %.0f m/s.\n", masa, velocidad);
                 } else {
                     puts("\nUtiliza un punto para los decimales.");
                     if (!leer_real_rango("Masa [kg] (1000 a 100000): ",
                                          1000.0, 100000.0, &masa) ||
-                        !leer_real_rango("Velocidad base [m/s] (1000 a 20000): ",
+                        !leer_real_rango("Rapidez post-TLI base [m/s] (1000 a 20000): ",
                                          1000.0, 20000.0, &velocidad)) {
                         puts("\nEntrada finalizada. Cerrando Artemis.");
                         return 0;
@@ -86,7 +87,7 @@ int main(void)
                     if (seleccion == 1) {
                         if (estadoNave.etapa == ETAPA_PREPARACION) {
                             puts("\nDECISION PREVIA AL DESACOPLE");
-                            puts("Elegir ajuste de velocidad al final de la TLI:");
+                            puts("Elegir ajuste ideal de rapidez antes del apagado:");
                             puts("1. Sin ajuste (+0 m/s)");
                             puts("2. Ajuste pequeno (+10 m/s)");
                             puts("3. Ajuste mayor (+50 m/s)");

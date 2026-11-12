@@ -3,9 +3,9 @@
 #include <math.h>
 #include <stdio.h>
 
-/* Modelo educativo 1D: Tierra y Luna quietas y masas puntuales. */
-/* Calcula el potencial gravitatorio especifico generado
-   por la Tierra y la Luna en una posicion determinada. */
+/* Modelo didactico: Tierra y Luna fijas, representadas como masas puntuales.
+   El eje Tierra-Luna es auxiliar para analizar gravedad y energia;
+   NO constituye una trayectoria orbital de Orion. */
    static double potencial_especifico(double distancia_tierra_m)
 {
     double distancia_luna_m = ARTEMIS_DISTANCIA_TIERRA_LUNA_M - distancia_tierra_m;
@@ -105,10 +105,10 @@ void artemis_ejecutar_tli(Mision *estado, double ajuste_velocidad)
     estado->supera_umbral_energetico = energia_restante >= 0.0;
     estado->alcanza_equilibrio = energia_restante >= 0.0;
    
-    puts("\n[EVENTO 1] ICPS ejecuta la maniobra TLI.");
-    printf("Ajuste decidido: +%.0f m/s\n", estado->ajuste_tli_ms);
-    printf("Velocidad tras la TLI: %.2f m/s\n", estado->velocidad_final_ms);
-    printf("Energia cinetica tras TLI: %.3e J\n", estado->energia_final_j);
+     puts("\n[EVENTO 1] ICPS ejecuta la maniobra TLI.");
+    printf("Ajuste ideal previo al apagado: +%.0f m/s\n", estado->ajuste_tli_ms);
+    printf("Rapidez post-TLI: %.2f m/s\n", estado->velocidad_final_ms);
+    printf("Energia cinetica post-TLI: %.3e J\n", estado->energia_final_j);
     puts("La etapa ICPS se desacopla y se apagan los motores principales.");
 
     estado->etapa = ETAPA_TLI;
@@ -128,10 +128,15 @@ int artemis_avanzar_evento(Mision *estado)
             -ARTEMIS_G * ARTEMIS_MASA_TIERRA_KG / (radio_inicial * radio_inicial)
             + ARTEMIS_G * ARTEMIS_MASA_LUNA_KG / (distancia_luna * distancia_luna);
 
-        puts("\n[EVENTO 2] Orion avanza sin propulsion principal.");
-        puts("La primera ley de Newton no elimina la gravedad: su velocidad cambia.");
-        printf("Aceleracion neta inicial sobre el eje idealizado: %.6f m/s^2\n",
+        puts("\n[EVENTO 2] Movimiento sin propulsion principal.");
+        puts("La inercia permite continuar el movimiento sin empuje.");
+        puts("La gravedad sigue actuando y modifica el vector velocidad.");
+        printf("Campo neto inicial en el eje auxiliar Tierra-Luna: %.6f m/s^2\n",
                aceleracion_neta);
+        puts("El signo negativo indica predominio de la atraccion terrestre.");
+        puts("En una salida radial ideal, su gravedad se opone al avance y");
+        puts("pierde intensidad a medida que aumenta la distancia terrestre.");
+        puts("No es una desaceleracion orbital real calculada para Orion.");
         estado->etapa = ETAPA_INERCIA;
         registrar_evento(estado, 2);
         return 1;
@@ -173,10 +178,10 @@ void artemis_mostrar_estado(const Mision *estado)
            estado->modo_experimental ? "modo experimental" : "modo referencia",
            estado->masa_kg);
     if (estado->etapa == ETAPA_PREPARACION) {
-        printf("Velocidad base planificada: %.2f m/s\n", estado->velocidad_base_ms);
+        printf("Rapidez post-TLI de referencia: %.2f m/s\n", estado->velocidad_base_ms);
         puts("Estado: esperando la maniobra TLI.");
     } else {
-        printf("Velocidad de salida: %.2f m/s | Ajuste: +%.0f m/s\n",
+        printf("Rapidez post-TLI: %.2f m/s | Ajuste ideal: +%.0f m/s\n",
                estado->velocidad_final_ms, estado->ajuste_tli_ms);
         printf("Eventos completados: %d de 3\n", estado->cantidad_eventos - 1);
     }
@@ -222,22 +227,30 @@ void artemis_mostrar_reporte(const Mision *estado)
     for (i = 0; i < estado->cantidad_eventos; i++) {
         printf("  %d. %s\n", i + 1, nombre_evento(estado->historial[i]));
     }
-    puts("Limites: modelo 1D con cuerpos fijos; sin orbita ni consumo de combustible.");
+    puts("Interpretacion A: deficit post-TLI, aporte hipotetico previo al apagado.");
+    puts("Limites: eje auxiliar Tierra-Luna y cuerpos fijos; sin trayectoria orbital");
+    puts("real, retorno libre calculado ni consumo de combustible.");
     puts("===========================================");
 }
 
 void artemis_mostrar_fundamentos(void)
 {
     puts("\n============= FUNDAMENTOS =============");
-    puts("1. Inercia: sin propulsores la nave sigue moviendose;");
-    puts("   la gravedad produce aceleracion y altera su velocidad.");
-    puts("2. Energia cinetica: K = (m * v * v) / 2.");
-    puts("3. Conservacion: si no hay empuje ni perdidas, K + U es constante.");
-    puts("4. Equilibrio idealizado: igual magnitud de atraccion de Tierra y Luna.");
-    puts("5. El ajuste +delta-v se aplica ANTES del desacople de ICPS.");
-    puts("6. El incremento de K NO equivale al combustible consumido.");
-    puts("7. Una ida real puede requerir mas propulsion desde el pozo terrestre,");
-    puts("   pero el combustible depende de la nave y del plan de vuelo.");
-    puts("Este prototipo NO reproduce la trayectoria orbital de retorno libre.");
+    puts("a) Inercia: sin empuje la nave sigue moviendose, pero la gravedad");
+    puts("   ejerce una fuerza y cambia su vector velocidad (leyes de Newton).");
+    puts("   En la salida radial ideal, la gravedad terrestre se opone al");
+    puts("   alejamiento y su intensidad disminuye con la distancia.");
+    puts("b) Energia cinetica post-TLI: K = m * v^2 / 2.");
+    puts("c) Modelo: Tierra y Luna fijas. Calculamos donde sus atracciones");
+    puts("   se igualan, usando el eje Tierra-Luna solo como referencia.");
+    puts("   El cambio de potencial especifico es delta_phi = phi_final - phi_inicial.");
+    puts("   Deficit = max(0, delta_phi - v_post_TLI^2 / 2), en J/kg.");
+    puts("   Es energia que habria faltado aportar ANTES del apagado, no");
+    puts("   una maniobra que el programa realiza despues de la TLI.");
+    puts("d) En la ida se necesita energia para alejarse de la Tierra;");
+    puts("   en el regreso la gravedad puede transformar potencial en cinetica.");
+    puts("   No es posible deducir la masa de combustible con estos datos.");
+    puts("Los ajustes son ideales y no representan consumo real de combustible.");
+    puts("El programa NO calcula una orbita ni una trayectoria de retorno libre.");
     puts("=========================================");
 }
